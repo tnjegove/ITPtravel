@@ -67,6 +67,7 @@ public class fetchBusStationInfo extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        FirstFragment.data.setText(this.results.get(0).getDm_latitude());
+        MainActivity.StationDataList = this.results;
+        FirstFragment.data.setText("Stations loaded. Current coordinates - latitude: " +MainActivity.latitude + "/n longitude: " +MainActivity.longitude);
     }
 }
