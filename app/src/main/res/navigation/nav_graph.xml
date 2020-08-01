@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
             app:destination="@id/SecondFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_FavouritesFragment"
+            app:destination="@+id/FavouritesFragment" />
     </fragment>
     <fragment
         android:id="@+id/SecondFragment"
@@ -24,6 +27,9 @@
         <action
             android:id="@+id/action_SecondFragment_to_ThirdFragment"
             app:destination="@id/ThirdFragment" />
+        <action
+            android:id="@+id/action_SecondFragment_to_FirstFragment"
+            app:destination="@+id/FirstFragment"/>
     </fragment>
     <fragment
         android:id="@+id/ThirdFragment"
@@ -33,6 +39,16 @@
 
         <action
             android:id="@+id/action_ThirdFragment_to_SecondFragment"
+            app:destination="@id/SecondFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/FavouritesFragment"
+        android:name="com.example.itptravel.FavouritesFragment"
+        android:label="Favourites Fragment"
+        tools:layout="@layout/fragment_favourites">
+
+        <action
+            android:id="@+id/action_FavouritesFragment_to_SecondFragment"
             app:destination="@id/SecondFragment" />
     </fragment>
 </navigation>

@@ -2,12 +2,8 @@ package com.example.itptravel;
 
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -16,33 +12,34 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.util.Log;
 import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
     public static ArrayList<StationDataMember> StationDataList= new ArrayList<StationDataMember>();
+    public static ArrayList<String> favouriteStations = new ArrayList<String>();
     public static double latitude;
     public static double longitude;
     public static String foundStationID;
@@ -58,15 +55,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        populateFavourites();
+        Log.d("Main/onCreate",favouriteStations.toString());
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
+
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         locationRequest = new LocationRequest();
         locationRequest.setInterval(5000);
@@ -84,6 +77,33 @@ public class MainActivity extends AppCompatActivity {
         updateGPS();
         startLocationUpdates();
 
+
+
+    }
+
+    private void populateFavourites() {
+        File directory = new File(getApplicationContext().getFilesDir().getAbsolutePath()+File.separator+"ITPTravel");
+        if (directory.exists()) {
+            String fileName = "favourites.dat";
+            FileInputStream fileInputStream;
+            try {
+                fileInputStream = new FileInputStream(directory+File.separator+fileName);
+                ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+                favouriteStations = (ArrayList<String>) objectInputStream.readObject();
+                objectInputStream.close();
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Log.d("MainActivity/popFavs","File not found.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            Log.d("Main/popFavs","directory not found");
+        }
 
 
     }

@@ -52,7 +52,7 @@ public class ThirdFragment extends Fragment {
         });
         textview_thirdFragment = (TextView) view.findViewById(R.id.textview_third);
         getRealTimeInfo getrealtimeinfo = new getRealTimeInfo();
-        getrealtimeinfo.execute();
+        getrealtimeinfo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 
 

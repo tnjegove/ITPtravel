@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,15 +18,21 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -35,6 +42,8 @@ public class SecondFragment extends Fragment {
     public static ArrayList<String> routeInfo = new ArrayList<String>();
     private static final String TAG = "SecondFragment" ;
     private TextView data;
+    private Button btn_frag2GoBack;
+    FloatingActionButton fab;
     Spinner spinner;
     @Override
     public View onCreateView(
@@ -49,6 +58,16 @@ public class SecondFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         data = (TextView) view.findViewById(R.id.textview_second);
         spinner = (Spinner) view.findViewById(R.id.sp_routeList);
+        fab = view.findViewById(R.id.fab_addFavourite);
+        btn_frag2GoBack = view.findViewById(R.id.btn_frag2GoBack);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MainActivity.favouriteStations.add(MainActivity.foundStationID);
+                Toast.makeText(getActivity().getApplicationContext(),"Station added to favourites.", Toast.LENGTH_SHORT).show();
+                writeToFile();
+            }
+        });
 
         view.findViewById(R.id.button_second).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +82,33 @@ public class SecondFragment extends Fragment {
             }
         });
         getRouteInfo getRouteInfo = new getRouteInfo();
-        getRouteInfo.execute();
+        getRouteInfo.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        Log.d(TAG,"getRouteInfo executed.");
+        btn_frag2GoBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                NavHostFragment.findNavController(SecondFragment.this).navigate(R.id.action_SecondFragment_to_FirstFragment);
+            }
+        });
+    }
+
+    private void writeToFile() {
+        File directory = new File(getContext().getFilesDir().getAbsolutePath()+File.separator+"ITPTravel");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        String fileName = "favourites.dat";
+        ObjectOutput output;
+
+        try {
+            output = new ObjectOutputStream(new FileOutputStream(directory+File.separator+fileName));
+            output.writeObject(MainActivity.favouriteStations);
+            output.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private class getRouteInfo extends AsyncTask<Void,Void,Void> {
@@ -73,7 +118,7 @@ public class SecondFragment extends Fragment {
             super.onPostExecute(aVoid);
 
             Log.d(TAG,routeInfo.toString());
-            data.setText(routeInfo.toString());
+            data.setText("Station no: " +MainActivity.foundStationID);
             //NavHostFragment.findNavController(SecondFragment.this).navigate(R.id.action_SecondFragment_to_ThirdFragment);
             spinner.setAdapter(new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_spinner_item, routeInfo));
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -95,6 +140,7 @@ public class SecondFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             String urlString = "https://data.smartdublin.ie/cgi-bin/rtpi/busstopinformation?stopid="+MainActivity.foundStationID;
+            Log.d(TAG,"urlString = "+urlString);
             String stationData="";
             JSONObject stationDataJSON;
             JSONArray tempArray;

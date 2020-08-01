@@ -1,6 +1,7 @@
 package com.example.itptravel;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +69,6 @@ public class fetchBusStationInfo extends AsyncTask<Void, Void, Void> {
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         MainActivity.StationDataList = this.results;
-        FirstFragment.data.setText("Stations loaded. Current coordinates - latitude: " +MainActivity.latitude + "/n longitude: " +MainActivity.longitude);
+        Log.d("FetchBusStations","Stations loaded. Current coordinates - latitude: " +MainActivity.latitude + "/n longitude: " +MainActivity.longitude);
     }
 }

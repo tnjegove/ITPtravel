@@ -1,11 +1,8 @@
 package com.example.itptravel;
 
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +13,9 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import org.w3c.dom.Text;
-
 public class FirstFragment extends Fragment {
     public static TextView data;
-    public static Button gpsButton;
+
 
 
 
@@ -36,30 +31,26 @@ public class FirstFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         data = (TextView) view.findViewById(R.id.textView2);
-
-        view.findViewById(R.id.button_first).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         fetchBusStationInfo getJSON = new fetchBusStationInfo();
-        getJSON.execute();
-        gpsButton = view.findViewById(R.id.gps_button);
-        gpsButton.setOnClickListener(new View.OnClickListener() {
+        getJSON.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        final TrackStation startTracking = new TrackStation();
+        startTracking.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        view.findViewById(R.id.btn_favs).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                NavHostFragment.findNavController(FirstFragment.this).navigate(R.id.action_FirstFragment_to_FavouritesFragment);
 
 
             }
         });
-        TrackStation startTracking = new TrackStation();
-        startTracking.execute();
-
-
     }
     private class TrackStation extends AsyncTask<Void, Void, Void> {
         private boolean stationFound=false;
+
+
+
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
